@@ -1,1 +1,0 @@
-git show-ref --tags -d | sed 's/.*tags\///' | grep -v "\^" | sort -rV | head -n 1 > .git/commit-id
