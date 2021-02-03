@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+
+    stages{
+        stage('Deploy ke Prod'){
+            steps{
+                sh '''
+		oc delete -f dc/dc-prod.yaml -n production
+                oc apply -f dc/dc-prod.yaml -n production
+                '''
+            }
+        }
+	stage('Approve Apps ke Publik?'){
+            input {
+                message "Apakah Aplikasi akan di release ka Publik?"
+                ok "Yes, Route berhasil di publish"
+            }
+	   steps{
+		sh '''
+		oc get route
+		'''
+	   }
+	  post{
+                success {
+                    echo 'Aplikasi berhasil di publis'
+                }
+                failure {
+                    echo 'Aplikasi gagal di publis'
+                }
+	  }
+	}
+    }
+}
