@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    stages{
+        stage('Checkout'){
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/alanadiprastyo/jaguar-java-1.git']]])
+            }
+        }
+        stage('Build Maven'){
+            steps{
+                sh '''
+                export MAVEN_HOME=/opt/maven
+                export PATH=$PATH:$MAVEN_HOME/bin
+                mvn clean install
+                '''
+            }
+        }
+        stage('Build Docker Image'){
+            steps{
+                sh '''
+                export MAVEN_HOME=/opt/maven
+                export PATH=$PATH:$MAVEN_HOME/bin
+                mvn docker:build
+                '''
+            }
+        }
+        stage('Push Docker Image'){
+            steps{
+                sh '''
+                docker tag registry.lab-home.example.com/jaguar-java:latest registry.lab-home.example.com/jaguar-java:prod
+		docker push registry.lab-home.example.com/jaguar-java:prod
+                '''
+            }
+        }
+        stage('Deploy ke Dev'){
+            steps{
+                sh '''
+		oc delete -f dc/dc-prod.yaml -n production
+                oc apply -f dc/dc-prod.yaml -n production
+                '''
+            }
+        }
+	stage('Approve Apps ke Publik?'){
+            input {
+                message "Apakah Aplikasi akan di release ka Publik?"
+                ok "Yes, Route berhasil di publish"
+            }
+	   steps{
+		sh '''
+		oc get route
+		'''
+	   }
+	  post{
+                success {
+                    echo 'Image Testing Berhasil di simpan ke registry '
+                }
+                failure {
+                    echo 'Image Testing Gagal di simpan ke registry'
+                }
+	  }
+	}
+    }
+}
