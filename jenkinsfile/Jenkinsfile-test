@@ -36,8 +36,8 @@ pipeline {
         stage('Deploy ke Dev'){
             steps{
                 sh '''
-		oc delete -f dc/dc-test.yaml -n development
-                oc apply -f dc/dc-test.yaml -n development
+		oc delete -f dc/dc-test.yaml -n testing
+                oc apply -f dc/dc-test.yaml -n testing
                 '''
             }
         }
