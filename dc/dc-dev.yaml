@@ -1,0 +1,76 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+  labels:
+    app: jaguar-java
+    app.kubernetes.io/component: jaguar-java
+    app.kubernetes.io/instance: jaguar-java
+  name: jaguar-java
+spec:
+  replicas: 1
+  selector:
+    app: jaguar-java
+    deploymentconfig: jaguar-java
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: jaguar-java
+        deploymentconfig: jaguar-java
+    spec:
+      imagePullSecrets:
+      - name: registry-sec
+      containers:
+      - image: registry.lab-home.example.com/jaguar-java:latest
+        imagePullPolicy: IfNotPresent
+        name: jaguar-java
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+  test: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: jaguar-java
+    app.kubernetes.io/component: jaguar-java
+  name: jaguar-java
+spec:
+  ports:
+  - name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: jaguar-java
+    deploymentconfig: jaguar-java
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+  labels:
+    app: jaguar-java
+    app.kubernetes.io/component: jaguar-java
+  name: jaguar-java
+spec:
+  host: jaguar-java-development.apps.lab-home.example.com
+  port:
+    targetPort: 8080-tcp
+  to:
+    kind: Service
+    name: jaguar-java
+    weight: 100
+  wildcardPolicy: None
+
