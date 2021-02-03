@@ -18,4 +18,10 @@ public class Application {
 		return "Programming Hello World - version 3.1";
 	}
 
+        @RequestMapping(value="/about")
+        public String About(){
+                return "About Java SpringBoot";
+        }
+
+
 }

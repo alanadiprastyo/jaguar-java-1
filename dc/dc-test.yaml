@@ -26,7 +26,7 @@ spec:
       - name: registry-sec
       containers:
       - image: registry.lab-home.example.com/jaguar-java:testing
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: jaguar-java
         ports:
         - containerPort: 8080
