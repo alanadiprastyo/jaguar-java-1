@@ -32,12 +32,33 @@ pipeline {
                 '''
             }
         }
-        stage('Deploy to Dev'){
+        stage('Deploy ke Dev'){
             steps{
                 sh '''
-                pwd
+		oc delete -f dc/dc-dev.yaml -n development
+                oc apply -f dc/dc-dev.yaml -n development
                 '''
             }
         }
+	stage(Approve Image ke Testing?){
+            input {
+                message "Apakah Image dev akan di tag ke Testing?"
+                ok "Yes, Tag Image ke Testing"
+            }
+	   steps{
+		sh '''
+		docker tag registry.lab-home.example.com/jaguar-java:latest registry.lab-home.example.com/jaguar-java:testing
+		docker push registry.lab-home.example.com/jaguar-java:testing
+		'''
+	   }
+	  post{
+                success {
+                    echo 'Image Testing Berhasil di simpan ke registry '
+                }
+                failure {
+                    echo 'Image Testing Gagal di simpan ke registry'
+                }
+	  }
+	}
     }
 }
