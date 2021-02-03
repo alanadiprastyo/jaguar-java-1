@@ -33,7 +33,7 @@ pipeline {
                 '''
             }
         }
-        stage('Deploy ke Dev'){
+        stage('Deploy ke Testing'){
             steps{
                 sh '''
 		oc delete -f dc/dc-test.yaml -n testing
