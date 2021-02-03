@@ -40,7 +40,7 @@ pipeline {
                 '''
             }
         }
-	stage(Approve Image ke Testing?){
+	stage('Approve Image ke Testing?'){
             input {
                 message "Apakah Image dev akan di tag ke Testing?"
                 ok "Yes, Tag Image ke Testing"
