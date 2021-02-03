@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    stages{
+        stage('Deploy ke Testing'){
+            steps{
+                sh '''
+		oc delete -f dc/dc-test.yaml -n testing
+                oc apply -f dc/dc-test.yaml -n testing
+                '''
+            }
+        }
+	stage('Approve Image ke Production?'){
+            input {
+                message "Apakah Image dev akan di tag ke Production?"
+                ok "Yes, Tag Image ke Production"
+            }
+	   steps{
+		sh '''
+		docker tag registry.lab-home.example.com/jaguar-java:testing registry.lab-home.example.com/jaguar-java:prod
+		docker push registry.lab-home.example.com/jaguar-java:prod
+		'''
+	   }
+	  post{
+                success {
+                    echo 'Image Testing Berhasil di simpan ke registry '
+                }
+                failure {
+                    echo 'Image Testing Gagal di simpan ke registry'
+                }
+	  }
+	}
+    }
+}
