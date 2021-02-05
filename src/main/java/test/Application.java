@@ -15,7 +15,7 @@ public class Application {
 	
 	@RequestMapping(value="/")
 	public String Demo(){
-		return "Programming Hello World - version 3.1";
+		return "Programming Hello World - version 3.2";
 	}
 
         @RequestMapping(value="/about")
