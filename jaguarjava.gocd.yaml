@@ -24,8 +24,5 @@ pipelines:
             timeout: 0
             tasks:
             - exec:
-                arguments:
-                - clean
-                - install
-                command: mvn
+                command: ls
                 run_if: passed
