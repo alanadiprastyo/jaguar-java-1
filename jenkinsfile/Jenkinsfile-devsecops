@@ -1,4 +1,10 @@
 pipeline {
+
+    environment {
+        registry = "quay.io/alanadiprastyo"
+        registryCredential = 'quay_io'
+        dockerImage = ''
+    }
     agent any
 
     stages{
@@ -65,16 +71,21 @@ pipeline {
        
         stage('Build Container Image'){
             steps{
-                sh '''
-                docker build -t jaguarjava .
-                '''
+                script{
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                }
+                //sh '''
+                //docker build -t quay.io/alanadiprastyo/jaguar-java .
+                //'''
             }
         }
         stage('Push Container Image'){
-            steps{
-                echo "push to registry"
+            script {
+                docker.withRegistry( '', registryCredential ) {
+                dockerImage.push()
             }
         }
+        
         stage('Deploy ke Dev'){
             steps{
                 echo "Succes deploy to Dev"
