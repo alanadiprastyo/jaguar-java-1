@@ -19,6 +19,27 @@ pipeline {
         stage('i3gis AppSec') {
             steps {
                 script {
+                    echo "Scanning project jaguar-java with i3gis..."
+                    final String urlScan = """--location -g --request POST 'https://api.i3gis.id/scan-svc/scan' --header 'Content-Type: application/json' --header 'Authorization: Bearer N/dXtDoT3P5IKVMVJOndUSGYZoInEj4hZaZrAmJvTB9mI1Hck1KrgDzlQuGcBTgAox2BZugo77sWfjBLdZkOeWn+ydH9fUbT/l27D8dn79LeXVdwINo5uJJle5xvTLrPHF+5+5ISTMJeL79tuDmnkw==' -d '{"project_id":2}'"""
+                    final def (String responseScan, String codeScan) = sh(script: "set +x; curl -s -w '\n%{response_code}' $urlScan", returnStdout: true).trim().tokenize("\n")
+
+                    echo "HTTP response status code: $codeScan"
+
+                    if (codeScan != "200") {
+                        echo "Response: " + responseScan
+                        error("Build failed because scan not success...")
+                    } else {
+                        echo "Scan project jaguar-java with i3gis..."
+                    }
+
+                    echo "Scan project jaguar-java with i3gis is starting..."
+                }
+            }
+        }
+
+        stage('Status i3gis AppSec') {
+            steps {
+                script {
                     echo "Get scan status..."
                     final Boolean status_running = true
 
