@@ -25,11 +25,11 @@ pipeline {
         stage('Build Container Image'){
             steps{
                 sh '''
-                podman build -t jaguarjava
+                podman build -t jaguarjava .
                 '''
             }
         }
-        stage('Push Container Image Image'){
+        stage('Push Container Image'){
             steps{
                 echo "push to registry"
             }
