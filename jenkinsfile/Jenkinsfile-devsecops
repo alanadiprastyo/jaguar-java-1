@@ -1,7 +1,7 @@
 pipeline {
 
     environment {
-        registry = "quay.io/alanadiprastyo"
+        registry = "alanadiprastyo/jaguar-java"
         registryCredential = 'quay_io'
         dockerImage = ''
     }
@@ -95,6 +95,54 @@ pipeline {
                 echo "Succes deploy to Dev"
             }
         }
+
+        stage('i3gis DynaSec') {
+            steps {
+                script {
+                    echo "Scanning context 2 Context jaguar-java-demo FULL in site jaguar-java-demo with i3gis..."
+                    final String urlScan = """--location -g --request POST 'https://api.i3gis.id/dast-svc/scan' --header 'Content-Type: application/json' --header 'Authorization: Bearer QwjkGxM2hFqXR+uwrFka74MYyCnh9Xmcd2PXSidpwMfKBtcEjNO48jVUULrWvOTtEto7oL0i97BkyX0kdBnHb5aqC4tcaByvkK97OmU0JqaQes1tpbay0zMuI1IZFUh8' -d '{"context_id":2}'"""
+                    final def (String responseScan, String codeScan) = sh(script: "set +x; curl -s -w '\n%{response_code}' $urlScan", returnStdout: true).trim().tokenize("\n")
+
+                    echo "HTTP response status code: $codeScan"
+
+                    if (codeScan != "201") {
+                        echo "Response: " + responseScan
+                        error("Build failed because scan not success...")
+                    } else {
+                        echo "Scan context 2 Context jaguar-java-demo FULL in site jaguar-java-demo with i3gis..."
+                    }
+
+                    echo "Scan context 2 Context jaguar-java-demo FULL in site jaguar-java-demo with i3gis is starting..."
+                }
+            }
+        }
+
+        stage('i3gis DynaSec Status') {
+            steps {
+                script {
+                    echo "Get scan status..."
+                    final Boolean status_running = true
+
+                    while(status_running) {
+                        sleep(time: 5, unit: "SECONDS")
+                        echo "Scan still running..."
+                        final String urlStatus = """--location -g --request GET 'https://api.i3gis.id/dast-svc/context-integration/2' --header 'Content-Type: application/json' --header 'Authorization: Bearer QwjkGxM2hFqXR+uwrFka74MYyCnh9Xmcd2PXSidpwMfKBtcEjNO48jVUULrWvOTtEto7oL0i97BkyX0kdBnHb5aqC4tcaByvkK97OmU0JqaQes1tpbay0zMuI1IZFUh8'"""
+                        final def (String responseStatus, String codeStatus) = sh(script: "set +x; curl -s -w '\n%{response_code}' $urlStatus", returnStdout: true).trim().tokenize("\n")
+                        echo "HTTP response status code: $codeStatus"
+
+                        if (codeStatus != "200" && codeStatus != "404") {
+                            echo "Response: " + responseStatus
+                            error("Scan failed...")
+                        }
+
+                        if(codeStatus == "404") break
+                    }
+
+                    echo "Scan finished..."
+                }
+            }
+        }
+
         stage('Scan i3gis DynaSec'){
             steps{
                 echo "Succes Scan DynaSec"
