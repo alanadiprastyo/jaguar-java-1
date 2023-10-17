@@ -79,13 +79,15 @@ pipeline {
                 //'''
             }
         }
+
         stage('Push Container Image'){
             script {
                 docker.withRegistry( '', registryCredential ) {
                 dockerImage.push()
+                }
             }
         }
-        
+
         stage('Deploy ke Dev'){
             steps{
                 echo "Succes deploy to Dev"
