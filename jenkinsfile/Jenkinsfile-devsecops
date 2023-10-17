@@ -16,12 +16,32 @@ pipeline {
             }
         }
 
-        stage('i3gis SAST'){
-            steps{
-             echo 'Berhasil Scan i3gis SAST'
+        stage('i3gis AppSec') {
+            steps {
+                script {
+                    echo "Get scan status..."
+                    final Boolean status_running = true
+
+                    while(status_running) {
+                        sleep(time: 5, unit: "SECONDS")
+                        echo "Scan still running..."
+                        final String urlStatus = """--location -g --request GET 'https://api.i3gis.id/scan-svc/scan/2' --header 'Content-Type: application/json' --header 'Authorization: Bearer N/dXtDoT3P5IKVMVJOndUSGYZoInEj4hZaZrAmJvTB9mI1Hck1KrgDzlQuGcBTgAox2BZugo77sWfjBLdZkOeWn+ydH9fUbT/l27D8dn79LeXVdwINo5uJJle5xvTLrPHF+5+5ISTMJeL79tuDmnkw=='"""
+                        final def (String responseStatus, String codeStatus) = sh(script: "set +x; curl -s -w '\n%{response_code}' $urlStatus", returnStdout: true).trim().tokenize("\n")
+                        echo "HTTP response status code: $codeStatus"
+
+                        if (codeStatus != "200" && codeStatus != "404") {
+                            echo "Response: " + responseStatus
+                            error("Scan failed...")
+                        }
+
+                        if(codeStatus == "404") break
+                    }
+
+                    echo "Scan finished..."
+                }
             }
         }
-
+       
         stage('Build Container Image'){
             steps{
                 sh '''
