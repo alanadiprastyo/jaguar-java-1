@@ -1,0 +1,66 @@
+pipeline {
+    agent any
+
+    stages{
+        stage('Checkout'){
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/alanadiprastyo/jaguar-java-1.git']]])
+            }
+        }
+
+        stage('Build Maven'){
+            steps{
+                sh '''
+                mvn clean install
+                '''
+            }
+        }
+
+        stage('i3gis SAST'){
+            steps{
+             echo 'Berhasil Scan i3gis SAST'
+            }
+        }
+
+        stage('Build Container Image'){
+            steps{
+                sh '''
+                podman build -t jaguarjava
+                '''
+            }
+        }
+        stage('Push Container Image Image'){
+            steps{
+                echo "push to registry"
+            }
+        }
+        stage('Deploy ke Dev'){
+            steps{
+                echo "Succes deploy to Dev"
+            }
+        }
+        stage('Scan i3gis DynaSec'){
+            steps{
+                echo "Succes Scan DynaSec"
+            }
+        }
+
+	    stage('Deploy to Production'){
+            input {
+                message "Are you sure to deploy on Production?"
+                ok "Yes, Deploy to Production"
+            }
+	    steps{
+		    echo "Deploy to production"
+	    }
+	    post{
+                success {
+                    echo 'Services success deploy to prod'
+                }
+                failure {
+                    echo 'Services faild deploy to prod'
+                }
+	  }
+	}
+    }
+}
