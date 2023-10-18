@@ -89,7 +89,7 @@ pipeline {
 
         stage('Deploy ke Dev'){
             steps{
-                echo "Succes deploy to Dev"
+                echo "Succes deploy to Dev Test"
             }
         }
 
