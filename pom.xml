@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.demo</groupId>
 	<artifactId>JaguarSpring</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>JaguarSpring Maven Webapp</name>
 	<url>http://maven.apache.org</url>
